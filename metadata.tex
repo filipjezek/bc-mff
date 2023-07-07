@@ -3,8 +3,8 @@
 %%% Choose a language %%%
 
 \newif\ifEN
-\ENtrue   % uncomment this for english
-%\ENfalse   % uncomment this for czech
+% \ENtrue   % uncomment this for english
+\ENfalse   % uncomment this for czech
 
 %%% Configuration of the title page %%%
 
@@ -36,39 +36,39 @@
 %%% Fill in your details %%%
 
 % (Note: \xxx is a "ToDo label" which makes the unfilled visible. Remove it.)
-\def\ThesisTitle{\xxx{Thesis title}}
-\def\ThesisAuthor{\xxx{Your Name Surname}}
-\def\YearSubmitted{\xxx{YEAR}}
+\def\ThesisTitle{Nástroj pro průzkum a vizualizaci modelu pro simulátor mozku Mozaik}
+\def\ThesisAuthor{Filip Ježek}
+\def\YearSubmitted{2023}
 
 % department assigned to the thesis
-\def\Department{\xxx{Name of the department}}
+\def\Department{Katedra softwaru a výuky informatiky}
 % Is it a department (katedra), or an institute (ústav)?
-\def\DeptType{\xxx{Department}}
+\def\DeptType{Department}
 
-\def\Supervisor{\xxx{Supername Supersurname}}
-\def\SupervisorsDepartment{\xxx{department}}
+\def\Supervisor{Mgr. Ján Antolík, Ph.D.}
+\def\SupervisorsDepartment{Katedra softwaru a výuky informatiky}
 
 % Study programme and specialization
-\def\StudyProgramme{\xxx{study programme}}
-\def\StudyBranch{\xxx{study branch}}
+\def\StudyProgramme{Informatika}
+\def\StudyBranch{Databáze a web}
 
 \def\Dedication{%
 Dedication. \xxx{It is nice to say thanks to supervisors, friends, family, book authors and food providers.}
 }
 
 \def\AbstractEN{%
-\xxx{Abstracts are an abstract form of art. Use the most precise, shortest sentences that state what problem the thesis addresses, how it is approached, pinpoint the exact result achieved, and describe the applications and significance of the results. Highlight anything novel that was discovered or improved by the thesis. Maximum length is 200 words, but try to fit into 120. Abstracts are often used for deciding if a reviewer will be suitable for the thesis; a well-written abstract thus increases the probability of getting a reviewer who will like the thesis.}
+Simulations of biological neural networks are an important tool for understanding how the brain processes information. Mozaik is a program that allows such simulations to be created, run and analyzed. Currently, however, there is no easy way to visualize in it either the network or the data structures created by individual analyses. This work is a web application that allows users to visualize networks and data structures stored in datastores for individual simulations. The given visualizations can be searched using complex queries, interactively examined and compared with each other. This makes the work of researchers working with the Mozaik program much more efficient.
 % ABSTRACT IS NOT A COPY OF YOUR THESIS ASSIGNMENT!
 }
 
 \def\AbstractCS{%
-\xxx{You will need to submit both Czech and English abstract to the SIS, no matter what language you use in the thesis. If writing in English, translate the contents of \texttt{\textbackslash{}AbstractEN} into this field. In case you do not speak czech, your supervisor should be able to help you with the translation.}
+Simulace biologických neuronových sítí jsou důležitým nástrojem pro porozumění tomu, jak mozek zpracovává informace. Mozaik je program, který umožňuje takové simulace vytvářet, spouštět a analyzovat. V současné době ale neexistuje snadný způsob, jak v něm vizualizovat ani síť, ani datové struktury vytvořené jednotlivými analýzami. Tato práce je webová aplikace, která umožňuje vizualizovat sítě a datové struktury uložené v datastorech pro jednotlivé simulace. Dané vizualizace lze vyhledávat pomocí komplexních dotazů, interaktivně je zkoumat a vzájemně mezi sebou srovnávat. To výrazně zefektivňuje práci výzkumníků, kteří s programem Mozaik zacházejí.
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces.
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\Keywords{%
-\xxx{{key} {words}}
+{vizualizace} {webová aplikace} {model mozku}
 }
 
 % If your abstracts are long and do not fit in the infopage, you can make the
@@ -81,13 +81,13 @@ Dedication. \xxx{It is nice to say thanks to supervisors, friends, family, book 
 \ifEN\relax\else
 % If you are writing a czech thesis, you additionally need to fill in the
 % english translation of the metadata here!
-\def\ThesisTitleEN{\xxx{Thesis title in English}}
-\def\DepartmentEN{\xxx{Name of the department in English}}
-\def\DeptTypeEN{\xxx{Department}}
-\def\SupervisorsDepartmentEN{\xxx{Superdepartment}}
-\def\StudyProgrammeEN{\xxx{study programme}}
-\def\StudyBranchEN{\xxx{study branch}}
+\def\ThesisTitleEN{A model inspection/visualization tool for brain simulation framework}
+\def\DepartmentEN{Department of Software and Computer Science Education}
+\def\DeptTypeEN{Department}
+\def\SupervisorsDepartmentEN{Department of Software and Computer Science Education}
+\def\StudyProgrammeEN{Computer Science}
+\def\StudyBranchEN{Databases and Web}
 \def\KeywordsEN{%
-\xxx{{key} {words}}
+{visualization} {web application} {brain model}
 }
 \fi
