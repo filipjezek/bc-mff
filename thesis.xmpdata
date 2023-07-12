@@ -2,6 +2,6 @@
 
 \Author{Filip Ježek}
 \Title{A model inspection/visualization tool for brain simulation framework}
-\Keywords{visualization\sep web application\sep brain model}
+\Keywords{visualization\sep web application\sep scientific software\sep biological neural networks\sep neuroscience}
 \Subject{Simulations of biological neural networks are an important tool for understanding how the brain processes information. Mozaik is a workflow framework that allows such simulations to be created, run and analyzed. Currently, however, there is no easy way to visualize in it either the network or the data structures created by individual analyses. This work is a web application that allows users to visualize networks and data structures stored in datastores for individual simulations. The given visualizations can be searched using complex queries, interactively examined and compared with each other. This makes the work of researchers working with the Mozaik framework much more efficient.}
 \Publisher{Charles University}

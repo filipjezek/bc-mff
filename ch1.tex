@@ -1,8 +1,13 @@
 \chapter{Mozaik}
-\label{chap:refs}
 \section{Práce s frameworkem}
 
 Mozaik je framework pro Python, pomocí kterého lze snadno specifikovat 2-rozměrné vrstvy neuronů, nad kterými pak běží experimenty. Experimenty produkují data, která lze analyzovat různými algoritmy a~zaznamenávat jejich výstupy. V Mozaik tutorialu\footnote{\url{https://github.com/CSNG-MFF/mozaik/blob/master/doc/source/tutorial.1.rst}} je ukázán příklad, na který se zde (v~trochu zkrácené podobě) podíváme.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.6\linewidth]{img/mozaik_control_flow.png}
+  \caption{Control flow mezi jednotlivými komponentami Mozaiku\cite{MozaikIntroduction}}
+\end{figure}
 
 Kód je rozdělen na 6~hlavních částí. Část 1 a~2 jsou definice neuronových vrstev - třída \lstinline|Model| a~její parametry:
 
