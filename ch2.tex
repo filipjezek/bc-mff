@@ -1,10 +1,11 @@
 \chapter{Analýza požadavků}
+\label{chap:requirements}
 
 Požadavky na aplikaci byly zadány dobře a~přesně, díky tomu, že vzešly přímo od budoucích uživatelů. Aplikace byla nasazena už během vývoje a~průběžně používána, což napomohlo najít nedostatky včas a~uvést ji do stávající podoby.
 
 \section{Přenos velkého objemu dat}
 
-Aplikace musí zvládnout načíst a~zpracovat datastory co největší velikosti. Velikost datastoru se pohybuje v~řádu gigabytů, neuronů mohou být desítky tisíc a~hran desítky milionů. Je potřeba minimalizovat velikost dat pro přenos po síti, a je důležité dát si pozor na nápor na paměť serveru. Výše zmíněná instance měla k dispozici zhruba 8G paměti --- na tento limit se během provozu alespoň ze začátku naráželo často. O něco méně je to problém u klienta. Pochopitelně se zdroji nechceme plýtvat, ale stroje, na kterých se aplikace ve výsledku spouští, patří výzkumníkům a jsou výkonné.
+Aplikace musí zvládnout načíst a~zpracovat datastory co největší velikosti. Velikost datastoru se pohybuje v~řádu gigabytů, neuronů mohou být desítky tisíc a~hran desítky milionů. Je potřeba minimalizovat velikost dat pro přenos po síti, a je důležité dát si pozor na nápor na paměť serveru. Výše zmíněná instance měla k dispozici zhruba 8GB paměti --- na tento limit se během provozu alespoň ze začátku naráželo často. O něco méně je to problém u klienta. Pochopitelně se zdroji nechceme plýtvat, ale stroje, na kterých se aplikace ve výsledku spouští, patří výzkumníkům a jsou výkonné.
 
 \section{Specifikace složek s datastore}
 

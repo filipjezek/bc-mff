@@ -1,4 +1,5 @@
 \chapter{Návrh architektury}
+\label{chap:architecture}
 
 Aplikace se skládá ze dvou hlavních celků, webového klienta a serveru. Většina logiky je na straně klienta, server slouží pouze pro načítání dat z datastore.
 
@@ -63,11 +64,11 @@ Podrobný popis celého API se nachází v příloze \ref{app:api}.
 
 \section{Webový klient}
 
-Klient sestává ze 4 hlavních vizuálních celků. Jedná se o souborový systém, navigátor, inspektor a přehled vybraných neuronů. Inspektor dále dynamicky instancuje modul pro vizualizaci v závislosti na typu vybrané ADS. Skutečná modulární struktura kódu silně vychází z použité technologie, proto bude podrobněji rozebrána v kapitole \xxx{XXX}.
+Klient sestává ze 4 hlavních vizuálních celků. Jedná se o souborový systém, navigátor, inspektor a přehled vybraných neuronů. Inspektor dále dynamicky instancuje modul pro vizualizaci v závislosti na typu vybrané ADS. Skutečná modulární struktura kódu silně vychází z použité technologie, proto bude podrobněji rozebrána v kapitole \ref{chap:implementation}.
 
 Souborový systém, navigátor a inspektor představují postupně specifičtější pohledy do datastore. Při zcela čistém startu klienta je nutné jimi postupně projít, ale jejich stav se zároveň ukládá do URL, takže je možné některé kroky (za předpokladu poskytnutí správných hodnot v URL) při otevření webobé stránky přeskočit.
 
-Protože při práci se občas hodí mít před očima co nejvíce informací naráz, a protože kvůli paměťové náročnosti není dobrý nápad mít aplikaci otevřenou ve více záložkách prohlížeče naráz, bylo potřeba najít způsob, jak umožnit změny layoutu a viditelnosti jednotlivých komponent. Zvolili jsme intuitivní způsob, na který už jsou uživatelé zvyklí z jiných míst. V klientovi jsou na několika místech použity kontejnery, zobrazující obsah vedle sebe, kde lze tažením myši měnit rozměry jednotlivých komponent. Ukázka na screenshotu \ref{fig:multiview}.
+Protože při práci se občas hodí mít před očima co nejvíce informací naráz, a protože kvůli paměťové náročnosti není dobrý nápad mít aplikaci otevřenou naráz ve více záložkách prohlížeče, bylo potřeba najít způsob, jak umožnit změny layoutu a viditelnosti jednotlivých komponent. Zvolili jsme intuitivní způsob, na který už jsou uživatelé zvyklí z jiných míst. V klientovi jsou na několika místech použity kontejnery, zobrazující obsah vedle sebe, kde lze tažením myši měnit rozměry jednotlivých přihrádek. Ukázka na screenshotu \ref{fig:multiview}.
 
 \begin{figure}
   \centering
@@ -88,11 +89,11 @@ Souborový systém zobrazuje složky a datastory. První složky, které uživat
 
 \subsection{Navigátor}
 
-Navigátor reprezentuje tabulku ADS. Jednotlivé buňky obsahují různé datové typy parametrů, a musí tedy být specializované. Ve stejném sloupci se nicméně předpokládá stejný datový typ, podobně jako v relačních databázích. Jelikož je potřeba mít opravdu silný a robustní způsob vyhledávání, řazení a projekce ADS, je součástí navigátoru SQL editor. Je možné s ADS pracovat, jako by byly uloženy v relační tabulce s podporou pro datový typ JSON. Kromě standardního SQL jsme přidali několik dalších funkcí, které zjednodušují běžnou práci. Více se o nich opět lze dočít v kapitole \xxx{XXX}. SQL jako součást user experience bylo zvolené s ohledem na to, že očekávanými uživateli jsou vývojáři. Pro zjednodušení ale byly přidány i klasické UX prvky. Sloupce lze jedním kliknutím řadit, lze je také filtrovat pomocí specializovaných dialogů. Interně jsou tyto akce nicméně opět převedeny na SQL query. Tyto pomocné filtry a řazení sice stačí po většinu času, na opravdu komplikované dotazy už ale je potřeba SQL měnit ručně.
+Navigátor reprezentuje tabulku ADS. Jednotlivé buňky obsahují různé datové typy parametrů, a musí tedy být specializované. Ve stejném sloupci se nicméně předpokládá stejný datový typ, podobně jako v relačních databázích. Jelikož je potřeba mít opravdu silný a robustní způsob vyhledávání, řazení a projekce ADS, je součástí navigátoru SQL editor. Je možné s ADS pracovat, jako by byly uloženy v relační tabulce s podporou pro datový typ JSON. Kromě standardního SQL jsme přidali několik dalších funkcí, které zjednodušují běžnou práci. Více se o nich opět lze dočíst v kapitole \ref{chap:implementation}. SQL jako součást user experience bylo zvolené s ohledem na to, že očekávanými uživateli jsou vývojáři. Pro zjednodušení ale byly přidány i klasické UX prvky. Sloupce lze jedním kliknutím řadit, lze je také filtrovat pomocí specializovaných dialogů. Interně jsou tyto akce nicméně opět převedeny na SQL query. Tyto pomocné filtry a řazení sice stačí po většinu času, na opravdu komplikované dotazy už ale je potřeba SQL měnit ručně.
 
 \subsection{Inspektor}
 
-Inspektor slouží k prohlížení jednotlivých vizualizací. Mezi požadavky na aplikaci je, že musí být možné vybrat několik ADS a mezi nimi rychle přepínat, nebo jich i zobrazit více vedle sebe. Na takovou činnost jsou uživatelé běžně zvyklí například z prohlížeče nebo textových editorů, které používají záložky. Inspektor proto pro co největší intuitivnost používá pro jednotlivé ADS také záložky, které lze řadit, otvírat, zavírat a kombinovat. Pro každou záložku se potom instancuje modul v závislosti na typu ADS. Za načítání doplňujících dat jsou pak zodpovědné právě tyto specializované moduly. 
+Inspektor slouží k prohlížení jednotlivých vizualizací. Mezi požadavky na aplikaci je, že musí být možné vybrat několik ADS a mezi nimi rychle přepínat, nebo jich i zobrazit více vedle sebe. Na takovou činnost jsou uživatelé běžně zvyklí například z prohlížeče nebo textových editorů, které používají záložky. Inspektor proto pro co největší intuitivnost používá totéž řešení. Záložky lze řadit, otvírat, zavírat a kombinovat. Pro každou z nich se potom instancuje modul v závislosti na typu ADS. Za načítání doplňujících dat jsou pak zodpovědné právě tyto specializované moduly. 
 
 \subsection{Přehled vybraných neuronů}
 

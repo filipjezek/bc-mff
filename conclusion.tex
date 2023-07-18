@@ -1,10 +1,29 @@
 
-\chapwithtoc{Conclusion}
+\chapwithtoc{Závěr}
 
-In the conclusion, you should summarize what was achieved by the thesis. In a few paragraphs, try to answer the following:
-\begin{itemize}
-  \item Was the problem stated in the introduction solved? (Ideally include a list of successfully achieved goals.)
-  \item What is the quality of the result? Is the problem solved for good and the mankind does not need to ever think about it again, or just partially improved upon? (Is the incompleteness caused by overwhelming problem complexity that would be out of thesis scope\todo{This is quite common.}, or any theoretical reasons, such as computational hardness?)
-  \item Does the result have any practical applications that improve upon something realistic?
-  \item Is there any good future development or research direction that could further improve the results of this thesis? (This is often summarized in a separate subsection called `Future work'.)
-\end{itemize}
+Navrhli jsme a implementovali webovou aplikaci pro vizualizaci modelu a datových struktur vygenerovaných za běhu Mozaiku. Splnili jsme všechny vytyčené požadavky.
+
+\begin{description}
+  \item[Přenos velkého objemu dat] ze serveru je zajištěný streamováním ve formátu CSV. Je snadné část dat přenášených po síti ve formátu JSON začít také streamovat ve formátu CSV bez změny klienta.
+  \item[Specifikace složek s datastore] je možná ve spouštěcím skriptu.
+  \item[Přehledný výpis ADS] byl dosažen ve formě stránkované tabulky s buňkami specializovanými na různé datové typy.
+  \item[Filtrování a vyhledávání ADS] je možné buď pomocí SQL, nebo pomocí dialogových oken.
+  \item[Workspace s ADS] je implementováno ve formě záložek.
+  \item[Vícenásobné zobrazení] je podporováno.
+  \item[Sdílené nastavení] ADS je rovněž podporováno.
+  \item[Connections] jsou vizualizovány jako interaktivní scatterplot.
+  \item[PerNeuronValue] je vizualizována jako obarvený interaktivní scatterplot.
+  \item[PerNeuronPairValue] je vizualizována jako interaktivní matice.
+  \item[AnalogSignalList] je vizualizován jako interaktivní kombinace scatterplotu a čárového grafu.
+  \item[Udržovatelnost] byla dosažena volbou frameworku, čistým a přehledným kódem a velkým množstvím automatických testů.
+\end{description}
+
+\section*{Možná rozšíření}
+
+\subsection*{Alternativní barevné škály}
+
+V různých případech se hodí použít různé barevné škály, v závislosti na tom, jaké informace jsou pro uživatele důležité a jak s daty chce zacházet\cite{silva2007there}. Zatím neexistuje v aplikaci možnost vybírat z jiných škál než z periodické a neperiodické. Tato funkčnost by přinesla možnost efektivnější analýzy.
+
+\subsection*{Permutace maticové vizualizace}
+
+Současná maticová vizualizace je užitečná pro rychlé zjištění specifické hodnoty. Je ale obtížné z ní vypozorovat existující trendy. Pro takovou funkčnost je nutné matici vhodně uspořádat\cite{chen2007handbook}. Bylo by vhodné implementovat jeden nebo více existujících algoritmů, například eliptickou seriaci\cite{chen2002generalized}

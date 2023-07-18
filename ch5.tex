@@ -1,0 +1,417 @@
+\chapter{Bližší pohled na frontend}
+\label{chap:frontend}
+
+V této kapitole se podrobněji podíváme na implementaci klíčových tříd ve webovém klientu.
+
+\section{Widgets}
+
+\subsection{MultiviewComponent}
+
+Tato komponenta je zodpovědná za layout s rozšiřovatelnými sloupci nebo řádky. Rozlišujeme hlavní a vedlejší osu. Ve směru hlavní osy lze rozšiřovat jednotlivé přihrádky, ve směru obou os lze přihrádky řadit. Ve výchozím stavu je hlavní osa horizontální. Vedlejší osa se projeví ve chvíli, kdy je specifikována seskupovací funkce. Ta seskupí přihrádky ve směru kolmém na osu hlavní a nadále se k nim chová jako k celku.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[mainAxisOrder, secondaryAxisOrder] jsou reference na funkce, které specifikují řazení přihrádek. Ve výchozím stavu jsou přihrádky řazeny podle pořadí jejich vytvoření.
+  \item[secondaryAxisGroup] je reference na seskupovací funkci. Ve výchozím stavu přihrádky seskupované nejsou.
+  \item[ratios, ratiosChange] dohromady tvoří bidirectional binding, tj. je to kombinace property a event emitteru. Jedná se o poměry velikostí jednotlivých přihrádek.
+  \item[relativeRatios] udává, zda je velikost přihrádek specifikována v procentech, nebo v pixelech. Pokud v pixelech a poměry nejsou definované, využije se property \lstinline|defaultGroupSize|.
+  \item[vertical] je property nastavující směr hlavní osy.
+\end{description}
+
+Jednotlivé přihrádky jsou v templatu specifikovány pomocí komponenty \lstinline|MultiviewPartitionComponent|. Ta se nevyrenderuje, ale poskytne rodičovské \lstinline|MultiviewComponent| referenci na svůj obsah. Každá přihrádka má property \lstinline|data|, která se využívá pro řazení a seskupování. Kromě toho má event emitter \lstinline|visible|, který signalizuje, zda má přihrádka vyšší než minimální rozměr. Minimální rozměr je zde proto, aby i v zcela zavřeném stavu bylo možné přihrádku myší snadno uchopit a roztáhnout.
+
+\begin{exmp}
+  Základní zobrazení pomocí \lstinline|MultiviewComponent|. Výsledný layout by měl mít 3 sloupce.
+
+  \begin{lstlisting}
+    @Component({
+      template: `
+        <mozaik-multiview-component
+          [mainAxisOrder]="order"
+          [secondaryAxisGroup]="group"
+        >
+          <mozaik-multiview-partition
+            *ngFor="let i of numbers"
+            [data]="i"
+          >
+            <span>number {{ i }}</span>
+          </mozaik-multiview-partition>
+        </mozaik-multiview-component>
+      `
+    }) class Usage {
+      numbers = [1, 15, 7, 8];
+      order = (a, b) => a - b;
+      group = (x) => x % 3;
+    }
+  \end{lstlisting}
+\end{exmp}
+
+\subsection{DraggableDirective}
+
+Toto directive se aplikuje na elementy, u kterých má uživatel mít možnost myší měnit pořadí. V aplikaci pomocí něj byly implementovány záložky pro ADS. Elementy jsou přehazovány uvnitř svého rodičovského elementu a pouze horizontálně. Po uchopení myší se element vyjme ze svého layoutu a na jeho místo se umístí stejně velký placeholder, který je možné stylovat. Vyjmutý element se pak posouvá s kurzorem. Pakliže by měl svým prostředkem přesáhnout prostředek vedlejšího elementu, vedlejší element a placeholder si animovaně prohodí pozice. Po puštění kurzoru je placeholder nahrazen zvednutým elementem. Pokud je rodičovský element horizontálně scrollovatelný a zvednutý element je přesunut myší úplně na kraj viditelného úseku, ale ještě není na kraji skutečného obsahu, rodičovský element bude scrollovat tak, aby bylo možné pokračovat v prohazování jeho dětí.
+
+\subsubsection*{Veřejné API}
+
+\lstinline|DraggableDirective| nabízí 4 eventy.
+
+\begin{itemize}
+  \item swapLeft
+  \item swapRight
+  \item lift
+  \item drop
+\end{itemize}
+
+\begin{remark}
+  Na této třídě lze obzvlášť ocenit eleganci, jakou nám nabízí RxJS. Podívejme se, jak stručně se dá shrnout hlavní funkčnost.
+
+  \begin{lstlisting}
+    fromEvent<MouseEvent>(
+      this.elRef.nativeElement, 
+      'mousedown'
+    )
+      .pipe(
+        tap((e) => {
+          e.preventDefault();
+          this.lift();
+          const el = this.elRef.nativeElement;
+          this.startX = e.clientX;
+          this.startOffsetX = el.offsetLeft -
+            el.parentElement.scrollLeft;
+        }),
+        switchMap(() =>
+          this.gEventS.mouseMove.pipe(
+            switchMap((e) => this.scrollIfNeccessary(e)),
+            takeUntil(
+              this.gEventS.mouseReleased.pipe(
+                tap(() => {
+                  this.drop();
+                })
+              )
+            )
+          )
+        )
+      )
+      .subscribe((e) => {
+        this.drag(e);
+      });
+  \end{lstlisting}
+\end{remark}
+
+\subsection{PropertyBagComponent}
+
+Jde o komponentu pro vizualizaci key-value objektů. Jednotlivé properties jsou zobrazeny jako samostatné elementy ve formě \lstinline|key: value|, přičemž po snazší vizuální orientaci má každý takový element přiřazenou barvu vygenerovanou ze jména property. Komponenta může fungovat i jako radio input pro výběr property. Toho je využito v navigátoru ve filtru pro key-value datové položky.
+
+\subsubsection*{Veřejné API}
+
+Komponenta implementuje \lstinline|ControlValueAccessor| interface, takže je schopna fungovat v Angular formulářích. Její radio funkčnost se zapne, když je do nějakého takového formuláře zapojena.
+
+\begin{description}
+  \item[bag] data, které chceme vizualizovat
+\end{description}
+
+\section{Common}
+
+\subsection{FilesystemComponent}
+
+Sidebar, který zobrazuje strom adresářů a datastore. Rekurzivně zobrazuje \lstinline|FolderComponent| a \lstinline|DatastoreComponent|. \lstinline|DatastoreComponent| se chová jako odkaz, který do URL přidá cestu ke správnému datastore. \lstinline|FolderComponent| vysílá akce \lstinline|loadDirectory|, \lstinline|loadRecursiveFilesystem| a \lstinline|toggleDirectory| (ta mění viditelnost obsahu složky).
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[files] objekt popisující adresářovou strukturu
+\end{description}
+
+\subsection{SelectedNeuronsComponent}
+
+V této komponentě uživatel může zkoumat neurony, které vybral v inspektoru. Pro každý neuron se vypisují metadata a jeho spojení, vše v rozbalovacích sekcích. Vycházející hrany se zobrazí rovnou, protože jsou ve stavu aplikace u každého neuronu uloženy. Pro vstupní hrany je ale potřeba projít celou síť, což u velké sítě a mnoha vybraných neuronů trvá dlouho. Proto se tato akce odkládá, dokud uživatel poprvé nerozbalí dotyčnou sekci u daného neuronu.
+
+Ať je neuron zobrazen v komponentě kdekoli (tj. ať ve své sekci, nebo jako druhý konec hrany), po najetí kurzorem se vyvolá \lstinline|hoverNode| akce. Při kliknutí se vyvolá buď \lstinline|selectNodes| nebo \lstinline|addSelectedNodes|, podle toho, zda se klikne se shiftem. Zároveň komponenta čte ze stavu, jaký neuron je právě pod kurzorem, a zvýrazní jej na všech jeho pozicích.
+
+Komponenta nemá žádné veřejné API, protože komunikuje přímo se store pomocí akcí.
+
+\subsection{DsTabsComponent}
+
+Jedná se o komponentu, která na základě stavu URL vytváří komponenty pro vizualizace viditelných ADS. Komponenta pro vizualizaci se zničí a vytvoří znovu kdykoli se přepne záložka na jinou a nazpátek. Každá taková komponenta zároveň implementuje interface \lstinline|DSPage|, která obsahuje referenci na template jménem \lstinline|controls|. Když je zapnuté sdílení nastavení, \lstinline|DsTabsComponent| zobrazí v k tomu určeném místě \lstinline|controls| z první viditelné ADS vizualizace každého typu. Součástí template \lstinline|DsTabsComponent| jsou samotné záložky, které jsou implementovány pomocí \lstinline|DraggableDirective|. Komponenta naslouchá jejich událostem a na základě toho aktulizuje URL, čímž se mění pořadí renderovaných vizualizací. Rovněž zajišťuje formulářový prvek pro výběr atributu, podle kterého jsou seskupovány zobrazené ADS v \lstinline|MultiviewComponent|.
+
+\subsection{DSTabHandleComponent}
+
+Komponenta záložky. Zajišťuje především vizuální stránku, ale zároveň mění URL při kliknutí na sebe různými tlačítky myši. Tím buď zobrazuje ADS, kterou reprezentuje, nebo ji zcela zavírá.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[ds] podmnožina parametrů zobrazované ADS. Očekává se, že budou zobrazovány pouze parametry odlišné od ostatních připravených ADS.
+  \item[viewing] je input, který nastavuje, zda je záložka prohlížena, nebo jen připravena.
+  \item[ignoreClick] je technický input obsluhovaný rodičovskou komponentou. Při tažení myší je totiž prohlížečem vyvolána událost kliknutí, který potřebujeme vyfiltrovat pryč.
+\end{description}
+
+\begin{exmp}
+  Ukázka použití \lstinline|ignoreClick|. Příklad je převzat ze zdrojového kódu \lstinline|DsTabsComponent|.
+
+  \begin{lstlisting}[language=XML]
+    <mozaik-ds-tab-handle
+      #handle
+      mozaikDraggable
+      *ngFor="let item of ready$ | async"
+      [ds]="item.ds"
+      [viewing]="item.viewing"
+      (lift)="handle.ignoreClick = false;
+        initReorderedTabs()"
+      (swapLeft)="handle.ignoreClick = true;
+        swapTabs(item.ds, true)"
+      (swapRight)="handle.ignoreClick = true;
+        swapTabs(item.ds, false)"
+      (drop)="commitReoderedTabs()"
+    ></mozaik-ds-tab-handle>
+  \end{lstlisting}
+\end{exmp}
+
+\subsection{DSSelectComponent}
+\label{comp:ds-select}
+
+Hlavní komponenta celého navigátoru. Její zodpovědností je propojit SQL editor a tabulku filtrovaných ADS. Zde se také počítá \lstinline|MAKE_DIFF| SQL funkce (\ref{sql:make_diff}). Při každé změně query (to nemusí být jen v editoru, ale i pomocí např. filtrovacích dialogů) se pomocí AlaSQL získá seznam filtrovaných a transformovaných ADS. Komponenta zkontroluje, zda byla \lstinline|MAKE_DIFF| v query využita a pokud ano, pro každou datovou buňku zjistí, zda má asociovaná \lstinline|MAKE_DIFF| metadata. Pro každý sloupec, ve kterém se metadata vyskytují, spočítá pomocí \lstinline|MAKE_INTERSECTION| (\ref{sql:make_intersection}) průnik pro každou hodnotu \lstinline|diffId|. Tu pak od relevantních datových buněk odečte pomocí \lstinline|SUBTRACT| (\ref{sql:subtract}).
+
+\subsection{SQEEditorComponent}
+
+Tato komponenta je wrapper nad editorem zdrojového kódu CodeMirror\footnote{\url{https://codemirror.net/}}.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[content] modifikovatelný obsah editoru
+  \item[query] event emitter pro spuštění dotazu
+  \item[error] event emitter notifikující o chybách při formátování
+\end{description}
+
+\subsection{DSTableComponent}
+
+Zde se zobrazuje SQL výstup. Při změně dat komponenta nejprve určí unikátní hodnoty v každém sloupci. Následně z první neprázdné hodnoty v každém sloupci určí jeho datový typ. Pro každý sloupec pak data umístí do správného typu buňky. Mapování datových typů na typy komponent pro buňky je nakonfigurováno v hashmapě v typescriptové třídě \lstinline|DSTableComponent| a v templatu se tento typ komponenty určuje dynamicky. Kvůli tomu není možné poskytnout datové buňce hodnotu přímo pomocí input atributu, ale je potřeba ji vložit pomocí dependency injection.
+
+\begin{exmp}
+  Dynamický typ datové buňky. V template použitá pipe \/\lstinline|purefn| slouží pouze k optimalizaci počtu volání.
+
+  \begin{lstlisting}[title={Template},language=XML]
+    <ng-template
+      *ngComponentOutlet="
+        cellTypes[colSchema[key]];
+        injector: getInjector | purefn :
+          row[i] :
+          rowRef.injector
+      "
+    ></ng-template>
+  \end{lstlisting}
+
+  \begin{lstlisting}[title={funkce getInjector}]
+    getInjector(value: any, parent: Injector) {
+      return Injector.create({
+        providers: [{
+          provide: DSCELL_VAL,
+          useValue: value
+        }],
+        parent,
+      });
+    }
+  \end{lstlisting}
+
+  \begin{lstlisting}[title={konstruktor konkrétní datové buňky}]
+    constructor(@Inject(DSCELL_VAL) public value: any) {}
+  \end{lstlisting}
+\end{exmp}
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[src] dvourozměrné pole dat
+  \item[keys] pole názvů jednotlivých sloupců
+  \item[rowHeight] input pro vynucení výšky řádku. Hodí se, pokud některé hodnoty jsou moc rozsáhlé a neúměrně zvyšují celý svůj řádek. Buňka, která je v takovém případě moc velká, dostane scrollbar.
+\end{description}
+
+\subsection{CellHeaderComponent}
+
+Tato komponenta slouží jako záhlaví pro sloupec v \lstinline|DSTableComponent|. Na základě typu buňky otevírá specifický filtrovací dialog (což je poměrně běžná komponenta, která pomocí formulářových prvků generuje SQL podmínky). Umí také vyvolat akce \lstinline|sortByColumn| a \lstinline|addCondition|.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[key] název sloupce
+  \item[type] datový typ sloupce
+  \item[distinctValues] unikátní hodnoty ve sloupci. Pokud jich je dostatečně málo, filtrovací dialog z nich dá uživateli přímo na výběr.
+\end{description}
+
+\subsection{SQLBuilder}
+
+Tato třída je klíčová pro modifikaci SQL dotazů. Využívá toho, že AlaSQL poskytuje přístup k vygenerovanému AST (Abstract Syntax Tree) pro každou query. AST není zdokumentovaný a jeho \lstinline|toString| metoda nefunguje správně, proto bylo nutné nejprve naprogramovat vlastní převod AST na dotaz. Strukturu AST jsme reverse-engineerovali a pro každou z nich byla napsána specifická metoda. Není to ideální návrh, ale modifikovat dynamicky neznámé třídy by bylo horší.
+
+\begin{exmp}
+  Ukázka fluent syntaxe \/\lstinline|SQLBuilder|
+
+  \begin{lstlisting}[language=c++]
+    SQLBuilderFactory
+      .create('SELECT a, b FROM data')
+      .andWhere('a > b')
+      .andWhere('a > 5')
+      .wrap()
+      .orderBy({key: 'a', asc: true})
+      .toString();
+    // SELECT * FROM (
+    //   SELECT a, b FROM data WHERE
+    //   a > b AND a > 5
+    // )
+    // ORDER BY a ASC
+  \end{lstlisting}
+\end{exmp}
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[statements] počet statementů ve zpracovávaném dotazu
+  \item[orderBy] přidá k dotazu řazení podle zadaného sloupce. Nahradí veškeré dosavadní řazení
+  \item[andHaving] přidá \lstinline|AND| podmínku do \lstinline|HAVING| části dotazu
+  \item[andWhere] přidá \lstinline|AND| podmínku do \lstinline|HAVING| části dotazu
+  \item[wrap] udělá z aktuálního dotazu subquery
+  \item[extractSortColumn] vrací sloupec, podle kterého se dotaz primárně řadí
+  \item[getColumnNames] vrací jména sloupců
+  \item[getAggregatedCols] vrací jména sloupců, které náleží k agregovacím funkcím
+  \item[escapeColumn] v poskytnutém SQL výrazu ošetří jména sloupců. Využívá přitom znalosti jmen sloupců v současném dotazu.
+  \item[escapeValue] ošetří hodnotu libovolného typu pro použití v SQL dotazu
+  \item[sanitizeStr] ošetří speciální znaky v textu
+  \item[toString] získá textový dotaz
+  \item[toFormattedString] získá hezky formátovaný textový dotaz
+\end{description}
+
+\subsection{makeDiff}
+\label{fn:makeDiff}
+
+Implementace SQL \lstinline|MAKE_DIFF| funkce. Vrací kopii hodnoty s přidanými metadaty. Skutečné filtrování properties se děje v této komponentě: \ref{comp:ds-select}.
+
+\section{DSPagesCommon}
+
+\subsection{DSPage}
+
+Abstraktní třída, která vyvolává akci \lstinline|loadSpecificAds| a poskytuje svým potomkům přístup k výsledné kompletní ADS. Dále jim poskytuje přístup k jejich části globálního stavu vizualizací.
+
+\subsection{HistogramComponent}
+
+Komponenta zodpovědná za renderování histogramu. Na výsledný histogram zobrazuje medián a aritmetický průměr hodnot. Počet přihrádek v histogramu lze do určité míry ovlivnit --- d3, které přihrádky počítá, akceptuje doporučený počet přihrádek.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[data] číselná data, ze kterých je histogram vytvořený
+  \item[extent] input pro rozsah číselných hodnot. Je poskytnut zvenku, protože se ve vizualizaci většinou používá na víc místech a dává tedy smysl ho počítat pro všechny využití naráz.
+  \item[thresholds] doporučený počet přihrádek, nebo funkce, která tento počet spočítá z dat
+\end{description}
+
+\subsection{ZoomFeature}
+Funkčnost pro vykreslení číselných os do 2D grafu, interaktivní přibližování a pohyb.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[transform] get-only property obsahující popis současné transformace souřadnic
+  \item[zoomCallback] se poskytne v konstruktoru a spustí se při každé transformaci
+\end{description}
+
+\subsection{NetworkGraph}
+
+Vizualizace neuronové vrstvy ve formě scatterplotu. Po označení neuronu umí zobrazit hrany vedoucí ven nebo dovnitř. Vysílá akce \lstinline|hoverNode|, \lstinline|selectNodes| a \lstinline|addSelectedNodes|.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[nodes] seznam neuronů k zobrazení
+  \item[allNodes] seznam všech neuronů
+  \item[sheetName] jméno zobrazované vrstvy
+  \item[showArrows] zda zobrazovat šipky pro jednotlivá neuronová spojení. Občas se hodí vypnout, je-li vrstva hodně hustá.
+  \item[highTransparency] se rovněž hodí použít při velmi hustých vizualizacích. Nevybrané neurony jsou vždy částečně průhledné, ale s tímhle nastavením výrazně víc.
+  \item[edgeDir] směr zobrazovaných spojení. Buď vstupní, výstupní, nebo obojí.
+\end{description}
+
+\subsection{LassoFeature}
+
+Funkčnost pro \lstinline|NetworkGraph|, která umožňuje myší nakreslit cestu a vybrat ohraničené neurony.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[rebind] metoda pro vyznačení prvků, které je možné lasovat
+\end{description}
+
+\subsection{NetworkZoomFeature}
+
+Třída dědící od \lstinline|ZoomFeature|, která navíc vykresluje čtvercovou síť.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[transformX, transformY] transformuje souřadnice neuronu do souřadnic grafu
+\end{description}
+
+\section{ModelPage}
+
+\subsection{ModelPageComponent}
+
+Dostali jsme se k první dynamicky importované vizualizační komponentě. Tato komponenta umí vizualizovat jak Connections ADS, tak PerNeuronValue, jejíž vizualizace je jen nástavbou na Connections. V obou případech je hlavní částí scatterplot s neurony, ale PerNeuronValue je navíc obarví podle jejich přiřazených hodnot. PerNeuronValue je kromě toho možné vizualizovat jako histogram. S tím vším se pojí některá další možná nastavení vizualizace, kde změny některých hodnot je časově náročné zpracovat (jmenovitě jde o filtr viditelných hodnot a doporučený počet přihrádek v histogramu). Proto při změně pouze těchto náročných parametrů, které jsou navíc z uživatelského hlediska implementované jako slidery, se vysílání \lstinline|setTabState| akcí odkládá, dokud neuběhlo od poslední změny alespoň 100ms.
+
+\subsection{PNVNetworkGraphComponent}
+
+Podtřída \lstinline|NetworkGraphComponent|, která přidává podporu pro obarvování neuronů a jejich filtrování.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[pnv] hodnoty jednotlivých neuronů
+  \item[pnvFilter] filtr zobrazených hodnot
+\end{description}
+
+\subsection{PNVFeature}
+
+Poskytuje \lstinline|PNVNetworkGraphComponent| funcionalitu pro filtrování hodnot a barvení neuronů
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[pnvLength] počet hodnot, které jsou vidět za daného filtru
+  \item[getColor] barva pro daný neuron
+  \item[setData] poskytnutí \lstinline|PNVFeature| filtru a hodnot neuronů
+  \item[filterPNV] schová odfiltrované neurony
+  \item[filterEdges] schová hrany, které vedou do nebo z odfiltrovaného neuronu
+  \item[redraw] obarví neurony
+\end{description}
+
+\section{PerNeuronPairValue}
+
+\subsection{PerNeuronPairValuePageComponent}
+
+Slouží k vizualizaci PerNeuronPairValue. Umí ji zobrazit jak jako histogram, tak jako matici. Podobně jako \lstinline|ModelPageComponent| umí filtrovat hodnoty a nastavovat doporučený počet přihrádek v histogramu, takže i tato komponenta se snaží brzdit rychle se měnící hodnoty daných nastavení.
+
+\subsection{MatrixComponent}
+
+Toto je dotyčná matice. Původní plán byl renderovat celou matici pixel po pixelu v SVG, ale jednotlivých čtverečků rychle bylo tolik, že i na hodně výkonném počítači byla její responzivita nepřípustná. Pixely se proto kreslí na canvas a jeho obsah se pak zobrazuje jako SVG image element. Omezíme se tím o některé vizuální efekty a musíme dopočítavat, nad kterým čtverečkem se nachází kurzor, ale namísto toho je vizualizace příjemná na používání.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[matrix] vstupní data
+  \item[filter] filtr hodnot
+  \item[periodic] zda jsou hodnoty v matici periodické. V takovém případě se používá jiná barevná škála.
+  \item[unit] jednotka hodnot v matici
+\end{description}
+
+\section{ASLPage}
+
+\subsection{ASLPageComponent}
+
+Tato komponenta zobrazuje AnalogSignalList, tedy seznam záznamů hodnoty měnící se s časem, kde každý záznam je přiřazený k jednomu neuronu. Ve vizualizaci je \lstinline|NetworkGraphComponent|, který slouží pro výběr neuronů. Vybrané neurony pak mají svou hodnotu vizualizovanou v podobě lomené čáry ve vedlejším grafu.
+
+\subsection{LinesGraphComponent}
+
+Komponenta pro vykreslení závislosti veličiny na čase. Jedná se o čárový graf, který lze interaktivně přibližovat a posouvat ve směru osy x. Podporuje vykreslování více veličin naráz, přičemž každé z nich přiřazuje barvu podle jejího pořadí. Kdykoli dojde ke změně zobrazovaných veličin, komponenta spočítá Voroného diagramy z poskytnutých bodů. Při pohybu myší nad grafem se pak zvýrazňuje nejbližší bod a lomená čára, jejíž je součástí. Zároveň je vyslána akce \lstinline|hoverNode| pro neuron náležející dané veličině. Voroného diagramy se počítají pro souřadnice při největším možném přiblížení grafu a při pohybu myší se pozice kurzoru do těchto souřadnic transformuje. Zobrazovaných bodů může být velké množství a bez tohoto opatření mohou být diagramy při velkém přiblížení kvůli zaokrouhlovacím chybám nepřesné.
+
+\subsubsection*{Veřejné API}
+
+\begin{description}
+  \item[ds] vizualizovaný AnalogSignalList
+  \item[selected] seznam označených neuronů
+\end{description}

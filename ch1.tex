@@ -1,7 +1,8 @@
 \chapter{Mozaik}
+\label{chap:mozaik}
 \section{Práce s frameworkem}
 
-Mozaik je framework pro Python, pomocí kterého lze snadno specifikovat 2-rozměrné vrstvy neuronů, nad kterými pak běží experimenty. Experimenty produkují data, která lze analyzovat různými algoritmy a~zaznamenávat jejich výstupy. V Mozaik tutorialu\footnote{\url{https://github.com/CSNG-MFF/mozaik/blob/master/doc/source/tutorial.1.rst}} je ukázán příklad, na který se zde (v~trochu zkrácené podobě) podíváme.
+Mozaik je framework pro Python, pomocí kterého lze snadno specifikovat 2-rozměrné vrstvy neuronů, nad kterými pak běží experimenty. Experimenty produkují data, která lze analyzovat různými algoritmy a~zaznamenávat jejich výstupy. V Mozaik tutorialu\cite{MozaikTutorial} je ukázán příklad, na který se zde (v~trochu zkrácené podobě) podíváme.
 
 \begin{figure}
   \centering
@@ -9,7 +10,7 @@ Mozaik je framework pro Python, pomocí kterého lze snadno specifikovat 2-rozm�
   \caption{Control flow mezi jednotlivými komponentami Mozaiku\cite{MozaikIntroduction}}
 \end{figure}
 
-Kód je rozdělen na 6~hlavních částí. Část 1 a~2 jsou definice neuronových vrstev - třída \lstinline|Model| a~její parametry:
+Kód je rozdělen na 6~hlavních částí. Část 1 a~2 jsou definice neuronových vrstev --- třída \lstinline|Model| a~její parametry. Stejný neuron může být součástí více vrstev na různých souřadnicích.
 
 \begin{lstlisting}[language=Python]
   class VogelsAbbott( Model ):
@@ -139,4 +140,4 @@ Tato datová struktura popisuje spojení mezi neurony, což jsou orientované hr
 
 \section{Předchozí práce}
 
-Tato práce navazuje na ročníkový projekt Kateřiny Čížkové~\cite{Cizkova2020nprg035}. Její program byla webová aplikace, která umožňovala interaktivně zobrazit neuronové vrstvy v~zadaném datastore. Původní záměr byl tento projekt rozšířit, ale, jak je v~dokumentaci projektu popsáno, kolegyně zvolila ne úplně vhodnou technologii a~doporučuje začít potenciálně zcela od začátku. Tato práce tedy namísto Python frameworku Bokeh používá Flask a~renderování vizualizací je specifikováno až ve frontendu (více podrobností je v~kapitole XX). Podobnost kódu je naprosto minimální, nicméně zejména ze začátku sloužil jako výborná inspirace.
+Tato práce navazuje na ročníkový projekt Kateřiny Čížkové~\cite{Cizkova2020nprg035}. Její program byla webová aplikace, která umožňovala interaktivně zobrazit neuronové vrstvy v~zadaném datastore. Původní záměr byl tento projekt rozšířit, ale, jak je v~dokumentaci projektu popsáno, kolegyně zvolila ne úplně vhodnou technologii a~doporučuje začít potenciálně zcela od začátku. Tato práce tedy namísto Python frameworku Bokeh používá Flask a~renderování vizualizací je specifikováno až ve frontendu (více podrobností je v~kapitole \ref{chap:implementation}). Podobnost kódu je naprosto minimální, nicméně zejména ze začátku sloužil jako výborná inspirace.
