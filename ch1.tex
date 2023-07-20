@@ -4,7 +4,7 @@
 
 Mozaik je framework pro Python, pomocí kterého lze snadno specifikovat 2-rozměrné vrstvy neuronů, nad kterými pak běží experimenty. Experimenty produkují data, která lze analyzovat různými algoritmy a~zaznamenávat jejich výstupy. V Mozaik tutorialu\cite{MozaikTutorial} je ukázán příklad, na který se zde (v~trochu zkrácené podobě) podíváme.
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \includegraphics[width=.6\linewidth]{img/mozaik_control_flow.png}
   \caption{Control flow mezi jednotlivými komponentami Mozaiku\cite{MozaikIntroduction}}
@@ -96,7 +96,7 @@ def perform_analysis_and_visualization(data_store):
   ...
 \end{lstlisting}
 
-V tuto chvíli můžeme použít modul \lstinline|mozaik.visualization| a vygenerovat množství rozmanitých grafů, které se uloží jako png soubory. My ale tuto funkcionalitu používat nebudeme a podíváme se raději na různé typy datových struktur, které se v datastore mohou nacházet.
+V tuto chvíli můžeme použít modul \lstinline|mozaik.visualization| a vygenerovat množství rozmanitých grafů, které se uloží jako png soubory. My ale chceme data prohledat interaktivně, takže tuto funkčnost používat nebudeme a podíváme se raději na různé typy datových struktur, které se v datastore mohou nacházet.
 
 \section{Datastore}
 
@@ -104,7 +104,7 @@ Datastore se na disk serializuje ve formátu pickle, což je binární protokol 
 
 \subsection{SingleValue}
 
-V celku triviální wrapper pro jedinou hodnotu.
+Wrapper pro jedinou hodnotu, obohacenou o důležitá metadata.
 
 \subsection{SingleValueList}
 
@@ -120,7 +120,7 @@ Seznam neuronů a matice hodnot pro každý jejich pár.
 
 \subsection{AnalogSignal}
 
-Jde o wrapper nad Neo \lstinline|AnalogSignal| \footnote{\url{https://neo.readthedocs.io/en/stable/api_reference.html\#neo.core.AnalogSignal}}, což je dvourozměrné pole periodicky měřených hodnot. Jedna dimenze odpovídá času a druhá jednotlivým zaznamenávaným kanálům. V praxi se ale v Mozaiku do AnalogSignalu zaznamenává pouze jeden kanál, takže se hodí o něm uvažovat jako o jednorozměrném poli.
+Jde o wrapper nad Neo \lstinline|AnalogSignal| \footnote{\url{https://neo.readthedocs.io/en/stable/api_reference.html\#neo.core.AnalogSignal}}, jenž k němu doplňuje klíčová metadata. Neo \lstinline|AnalogSignal| je dvourozměrné pole periodicky měřených hodnot. Jedna dimenze odpovídá času a druhá jednotlivým zaznamenávaným kanálům. V praxi se ale v Mozaiku do AnalogSignalu zaznamenává pouze jeden kanál, takže se hodí o něm uvažovat jako o jednorozměrném poli.
 
 \subsection{AnalogSignalList}
 

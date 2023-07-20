@@ -3,50 +3,17 @@
 
 Požadavky na aplikaci byly zadány dobře a~přesně, díky tomu, že vzešly přímo od budoucích uživatelů. Aplikace byla nasazena už během vývoje a~průběžně používána, což napomohlo najít nedostatky včas a~uvést ji do stávající podoby.
 
-\section{Přenos velkého objemu dat}
-
-Aplikace musí zvládnout načíst a~zpracovat datastory co největší velikosti. Velikost datastoru se pohybuje v~řádu gigabytů, neuronů mohou být desítky tisíc a~hran desítky milionů. Je potřeba minimalizovat velikost dat pro přenos po síti, a je důležité dát si pozor na nápor na paměť serveru. Výše zmíněná instance měla k dispozici zhruba 8GB paměti --- na tento limit se během provozu alespoň ze začátku naráželo často. O něco méně je to problém u klienta. Pochopitelně se zdroji nechceme plýtvat, ale stroje, na kterých se aplikace ve výsledku spouští, patří výzkumníkům a jsou výkonné.
-
-\section{Specifikace složek s datastore}
-
-Datastore k prohlížení se nachází na straně serveru. Aplikaci lze spustit na lokálním počítači, nebo například na serveru se sdílenými adresáři více uživatelů. V obou případech se hodí zadat serveru cestu, odkud může začít procházat adresářový strom. Jednak aby se zrychlilo vyhledávání uživatele, jednak kvůli bezpečnosti v případě veřejně přístupného serveru. Aplikace nesmí akceptovat cestu k datastore, která by nebyla potomkem nakonfigurovaného kořene. Zároveň by mělo být možné specifikovat více kořenů naráz.
-
-\section{Přehledný výpis ADS}
-
-Aplikace je potřeba kvůli zrychlení práce uživatelů. ADS by měly být zobrazeny tak, aby se šlo co nejrychleji zorientovat a najít to, co uživatel chce. ADS mají mnoho stejných parametrů, ty je potřeba umět vyfiltrovat a zobrazit jen ty, ve kterých se liší.
-
-\section{Filtrování a vyhledávání ADS}
-
-Na předchozí požadavek navazuje nutnost mít kvalitní vyhledávací systém. ADS by mělo být možné snadno a intuitivně filtrovat a řadit. Zároveň musí být filtrovací systém dostatečně silný na to, aby zvládal i hodně komplikované dotazy. Filtry by měly být přizpůsobené jednotlivým datovým typům parametrů.
-
-\section{Workspace s ADS}
-
-Načítání konkrétní ADS ze serveru může zabrat netriviální množství času. Je nutné mít možnost některé ADS označit a udržovat je v paměti, aby mezi nimi bylo možné rychle přepínat. Zároveň je nutné mít možnost konkrétní ADS z paměti odstranit a uvolnit zdroje.
-
-\section{Vícenásobné zobrazení}
-
-V určitých případech je rušivé a zdržující muset pořád přepínat mezi několika ADS, obzvlášť pokud je uživatel srovnává a hledá rozdíly a podobnosti. Tehdy je potřeba umět zobrazit více ADS naráz vedle sebe.
-
-\section{Sdílené nastavení}
-
-Každý druh vizualizace má svá specifická nastavení. Někdy se hodí moci upravovat nastavení pro každou ADS zvlášť, ale v případě vícenásobného zobrazení musí existovat možnost upravovat nastavení pro všechny zobrazené vizualizace stejného typu naráz.
-
-\section{Connections}
-
-Aplikace musí umět zobrazit spojení mezi neurony ve stejné vrstvě. Vrstva by měla být vizualizována jako interaktivní scatterplot.
-
-\section{PerNeuronValue}
-
-Aplikace musí umět vizualizovat PerNeuronValue ADS. Vizualizace by měla mít stejnou podobu jako vizualizace Connections, ale neurony by měly mít přiřazenou barvu na základě své hodnoty.
-
-\section{PerNeuronPairValue}
-
-Aplikace musí umět vizualizovat PerNeuronValue ADS. Vizualizace by měla být maticový graf.
-
-\section{AnalogSignalList}
-
-Aplikace musí umět vizualizovat AnalogSignalList ADS.
-
-\section{Udržovatelnost}
-
-Jeden z nejdůležitějších požadavků je udržovatelnost aplikace. Aplikace musí být napsána srozumitelně a rozšiřitelně. Musí být použity moderní technologie, které pravděpodobně brzy nezaniknou. Aplikace musí být dokumentována a důkladně otestována automatickými testy.
+\begin{description}
+  \item[Přenos velkého objemu dat] Aplikace musí zvládnout načíst a~zpracovat datastory co největší velikosti. Velikost datastoru se pohybuje v~řádu gigabytů, neuronů mohou být desítky tisíc a~hran desítky milionů. Je potřeba minimalizovat velikost dat pro přenos po síti, a je důležité dát si pozor na nápor na paměť serveru. Výše zmíněná instance měla k dispozici zhruba 8GB paměti --- na tento limit se během provozu alespoň ze začátku naráželo často. O něco méně je to problém u klienta. Pochopitelně se zdroji nechceme plýtvat, ale stroje, na kterých se aplikace ve výsledku spouští, patří výzkumníkům a jsou výkonné.
+  \item[Specifikace složek s datastore] Datastore k prohlížení se nachází na straně serveru. Aplikaci lze spustit na lokálním počítači, nebo například na serveru se sdílenými adresáři více uživatelů. V obou případech se hodí zadat serveru cestu, odkud může začít procházat adresářový strom. Jednak aby se zrychlilo vyhledávání uživatele, jednak kvůli bezpečnosti v případě veřejně přístupného serveru. Aplikace nesmí akceptovat cestu k datastore, která by nebyla potomkem nakonfigurovaného kořene. Zároveň by mělo být možné specifikovat více kořenů naráz.
+  \item[Přehledný výpis ADS] Aplikace je potřeba kvůli zrychlení práce uživatelů. ADS by měly být zobrazeny tak, aby se šlo co nejrychleji zorientovat a najít to, co uživatel chce. ADS mají mnoho stejných parametrů, ty je potřeba umět vyfiltrovat a zobrazit jen ty, ve kterých se liší.
+  \item[Filtrování a vyhledávání ADS] Na předchozí požadavek navazuje nutnost mít kvalitní vyhledávací systém. ADS by mělo být možné snadno a intuitivně filtrovat a řadit. Zároveň musí být filtrovací systém dostatečně silný na to, aby zvládal i hodně komplikované dotazy. Filtry by měly být přizpůsobené jednotlivým datovým typům parametrů.
+  \item[Workspace s ADS] Načítání konkrétní ADS ze serveru může zabrat netriviální množství času. Je nutné mít možnost některé ADS označit a udržovat je v paměti, aby mezi nimi bylo možné rychle přepínat. Zároveň je nutné mít možnost konkrétní ADS z paměti odstranit a uvolnit zdroje.
+  \item[Vícenásobné zobrazení] V určitých případech je rušivé a zdržující muset pořád přepínat mezi několika ADS, obzvlášť pokud je uživatel srovnává a hledá rozdíly a podobnosti. Tehdy je potřeba umět zobrazit více ADS naráz vedle sebe.
+  \item[Sdílené nastavení] Každý druh vizualizace má svá specifická nastavení. Někdy se hodí moci upravovat nastavení pro každou ADS zvlášť, ale v případě vícenásobného zobrazení musí existovat možnost upravovat nastavení pro všechny zobrazené vizualizace stejného typu naráz.
+  \item[Connections] Aplikace musí umět zobrazit spojení mezi neurony ve stejné vrstvě. Vrstva by měla být vizualizována jako interaktivní scatterplot.
+  \item[PerNeuronValue] Aplikace musí umět vizualizovat PerNeuronValue ADS. Vizualizace by měla mít stejnou podobu jako vizualizace Connections, ale neurony by měly mít přiřazenou barvu na základě své hodnoty.
+  \item[PerNeuronPairValue] Aplikace musí umět vizualizovat PerNeuronValue ADS. Vizualizace by měla být maticový graf.
+  \item[AnalogSignalList] Aplikace musí umět vizualizovat AnalogSignalList ADS.
+  \item[Udržovatelnost] Jeden z nejdůležitějších požadavků je udržovatelnost aplikace. Aplikace musí být napsána srozumitelně a rozšiřitelně. Musí být použity moderní technologie, které pravděpodobně brzy nezaniknou. Aplikace musí být dokumentována a důkladně otestována automatickými testy.
+\end{description}
